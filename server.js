@@ -28,7 +28,14 @@ const {
 const private_key = config.private_key || process.env.PRIVATE_KEY;
 let { base_token_uri } = config;
 const { collection_name, description, asset_dir } = collection;
-const keyfilePath = storage.arweave.key_file_path; // Get the keyfilePath from the storage object
+const arweaveKey = process.env.ARWEAVE_KEY; // Use ARWEAVE_KEY environment variable
+
+if (!private_key) {
+  throw new Error("PRIVATE_KEY environment variable is required");
+}
+if (!arweaveKey && reveal_required) {
+  throw new Error("ARWEAVE_KEY environment variable is required for NFT uploads");
+}
 
 const ERR_INTERNAL_SERVER_ERROR = "Internal Server Error";
 const ERR_READING_ODYSSEY = "Error reading odyssey:";
@@ -113,16 +120,15 @@ app.get("/api/get-mint-txn/:address/:mintQty", async ({ params: { address, mintQ
     let token_uri = base_token_uri || "";
     if (reveal_required && !base_token_uri) {
       console.log('Checking assets in:', asset_dir);
-      console.log('Keyfile path:', keyfilePath);
       try {
-        token_uri = await odysseyClient.uploadNFT(0, asset_dir, keyfilePath);
+        token_uri = await odysseyClient.uploadNFT(0, asset_dir, arweaveKey);
         console.log('Uploaded token_uri:', token_uri);
       } catch (error) {
         console.error(ERR_READING_MINT, 'Upload failed:', error.stack);
         return res.status(500).json({ error: ERR_INTERNAL_SERVER_ERROR });
       }
       if (token_uri) {
-        odysseyClient.writeConfigFile({ base_token_uri: token_uri });
+        odysseyClient.editConfigFile({ base_token_uri: token_uri });
         base_token_uri = token_uri;
       }
     }
@@ -144,7 +150,7 @@ app.get("/api/get-mint-txn/:address/:mintQty", async ({ params: { address, mintQ
 
 app.get("/api/test-upload", async (req, res) => {
   try {
-    const token_uri = await odysseyClient.uploadNFT(0, './assets', './__K1Qy-xfXGE2AuxYCd3dRxyp7VXPZ76F2Ywyw4YFoQ.json');
+    const token_uri = await odysseyClient.uploadNFT(0, './assets', arweaveKey);
     console.log('Test upload token_uri:', token_uri);
     res.json({ token_uri });
   } catch (error) {
@@ -168,7 +174,7 @@ app.post("/api/update-nft-data", async (req, res) => {
     console.log("Update NFT data", tokenNo, tokenAddress);
     const resImage = await updateMetaDataImage(tokenNo, tokenAddress);
 
-    odysseyClient.writeNftDataFile(tokenNo, tokenAddress);
+    odysseyClient.editNftDataFile(tokenNo, tokenAddress);
     res
       .status(200)
       .json({ message: "Successfully update nft data.", ...resImage });
@@ -192,7 +198,7 @@ async function updateMetaDataImage(tokenNo, tokenAddress) {
         tokenNo,
         tokenAddress,
         asset_dir,
-        keyfilePath,
+        arweaveKey,
         random_trait,
         collection_name,
         description
@@ -233,6 +239,7 @@ function getAccount(privateKey) {
   return account;
 }
 
-app.listen(3001, () => {
-  console.log("Server running on port 3001");
+const port = process.env.PORT || 3001;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
