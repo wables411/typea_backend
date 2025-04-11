@@ -7,8 +7,7 @@
   "odyssey_name": "Minting powered by Odyssey",
   "storage": {
     "arweave": {
-      "IPFSPath": "https://arweave.net",
-      "key_file_path": "__K1Qy-xfXGE2AuxYCd3dRxyp7VXPZ76F2Ywyw4YFoQ.json"
+      "IPFSPath": "https://arweave.net"
     }
   },
   "collection": {
