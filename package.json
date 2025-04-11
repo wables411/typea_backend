@@ -1,0 +1,17 @@
+{
+  "name": "type-a-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@aptos-labs/ts-sdk": "^0.0.1",
+    "aptivate-odyssey-sdk": "^3.2.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.3"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

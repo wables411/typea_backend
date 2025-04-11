@@ -1,0 +1,26 @@
+{
+
+  "name": "Type A Test",
+  "image": "",
+  "description": "this is a test",
+  "attributes": [
+
+    {
+
+      "trait_type": "Drip Grade",
+
+      "value": "ss-drip"
+
+    },
+
+    {
+
+      "trait_type": "Test",
+
+      "value": "red"
+
+    }
+
+  ]
+
+}
