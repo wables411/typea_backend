@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {
   Ed25519PrivateKey,
   Account,
@@ -11,11 +12,26 @@ const fs = require("fs");
 const cors = require("cors");
 const app = express();
 
-app.use(cors()); // Enable CORS for all routes
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://typea-frontend.vercel.app" // Update with your actual frontend URL
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 app.use(express.json());
 
 const odysseyClient = new OdysseyClient();
-const configData = fs.readFileSync("./config.json", "utf-8"); // Read the config.json file
+const configData = fs.readFileSync("./config.json", "utf-8");
 const config = JSON.parse(configData);
 const {
   network,
@@ -24,11 +40,10 @@ const {
   storage,
   random_trait,
   reveal_required,
+  base_token_uri,
 } = config;
-const private_key = config.private_key || process.env.PRIVATE_KEY;
-let { base_token_uri } = config;
-const { collection_name, description, asset_dir } = collection;
-const arweaveKey = process.env.ARWEAVE_KEY; // Use ARWEAVE_KEY environment variable
+const private_key = process.env.PRIVATE_KEY;
+const arweaveKey = process.env.ARWEAVE_KEY;
 
 if (!private_key) {
   throw new Error("PRIVATE_KEY environment variable is required");
@@ -234,7 +249,7 @@ function getNetwork(network) {
 function getAccount(privateKey) {
   const account = Account.fromPrivateKey({
     privateKey: new Ed25519PrivateKey(privateKey),
-    legacy: true, // or false, depending on your needs
+    legacy: true,
   });
   return account;
 }

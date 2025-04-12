@@ -1,6 +1,5 @@
 {
   "resource_account": "0x9ea5c766f5bdb7633c5a856391b376f91da3a674b4b7ddf7a13bf03864888d07",
-  "private_key": "",
   "network": "testnet",
   "random_trait": false,
   "reveal_required": true,
